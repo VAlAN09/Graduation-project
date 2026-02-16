@@ -17,8 +17,7 @@ const Sidebar = ({ mobileOpen, setMobileOpen }) => {
 
   return (
     <>
-      {/* Mobile overlay */}
-      <div 
+      <div
         className={clsx(
           "fixed inset-0 z-20 bg-black/50 transition-opacity lg:hidden",
           mobileOpen ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -26,7 +25,6 @@ const Sidebar = ({ mobileOpen, setMobileOpen }) => {
         onClick={() => setMobileOpen(false)}
       />
 
-      {/* Sidebar */}
       <aside className={clsx(
         "fixed top-0 left-0 z-30 h-screen w-64 bg-white border-r border-gray-100 transition-transform duration-300 lg:translate-x-0",
         mobileOpen ? "translate-x-0" : "-translate-x-full"
@@ -44,8 +42,8 @@ const Sidebar = ({ mobileOpen, setMobileOpen }) => {
                 href="#"
                 className={clsx(
                   "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-sm font-medium",
-                  item.active 
-                    ? "bg-blue-50 text-blue-600 shadow-sm" 
+                  item.active
+                    ? "bg-blue-50 text-blue-600 shadow-sm"
                     : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
                 )}
               >
