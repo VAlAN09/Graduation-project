@@ -2,9 +2,9 @@ import React from 'react';
 import { Database, Users, CalendarCheck, Clock, Layers, Star, UserPlus, FileText, Settings, LogOut } from 'lucide-react';
 import clsx from 'clsx';
 
-const Sidebar = ({ mobileOpen, setMobileOpen }) => {
+const Sidebar = ({ mobileOpen, setMobileOpen, activeTab, setActiveTab }) => {
   const menuItems = [
-    { icon: Database, label: 'Dashboard', active: true },
+    { icon: Database, label: 'Dashboard' },
     { icon: Users, label: 'Employees' },
     { icon: CalendarCheck, label: 'Attendance' },
     { icon: Clock, label: 'Leave Management' },
@@ -40,9 +40,18 @@ const Sidebar = ({ mobileOpen, setMobileOpen }) => {
               <a
                 key={item.label}
                 href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (setActiveTab) {
+                    setActiveTab(item.label);
+                  }
+                  if (setMobileOpen) {
+                    setMobileOpen(false);
+                  }
+                }}
                 className={clsx(
                   "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-sm font-medium",
-                  item.active
+                  activeTab === item.label
                     ? "bg-blue-50 text-blue-600 shadow-sm"
                     : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
                 )}
