@@ -29,6 +29,7 @@ const pageComponents = {
 function App() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('Dashboard');
+  const [userProfilePicture, setUserProfilePicture] = useState('https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff');
 
   const ActivePage = pageComponents[activeTab] || Dashboard;
 
@@ -37,10 +38,10 @@ function App() {
       <Sidebar mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <div className="flex-1 lg:ml-64 flex flex-col min-h-screen transition-all duration-300">
-        <TopHeader setMobileOpen={setMobileOpen} />
+        <TopHeader setMobileOpen={setMobileOpen} setActiveTab={setActiveTab} userProfilePicture={userProfilePicture} />
 
         <main className="flex-1 p-6 lg:p-8 overflow-y-auto w-full">
-          <ActivePage />
+          <ActivePage userProfilePicture={userProfilePicture} setUserProfilePicture={setUserProfilePicture} />
         </main>
       </div>
     </div>
