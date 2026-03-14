@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, Bell, ChevronDown, Menu, User, Settings as SettingsIcon, LogOut } from 'lucide-react';
 
 const TopHeader = ({ setMobileOpen, setActiveTab, userProfilePicture }) => {
@@ -6,6 +7,7 @@ const TopHeader = ({ setMobileOpen, setActiveTab, userProfilePicture }) => {
     const [notificationsOpen, setNotificationsOpen] = useState(false);
     const profileRef = useRef(null);
     const notificationsRef = useRef(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -125,7 +127,11 @@ const TopHeader = ({ setMobileOpen, setActiveTab, userProfilePicture }) => {
                             </button>
                             <div className="h-px bg-gray-100 my-2"></div>
                             <button
-                                onClick={() => setProfileOpen(false)}
+                                onClick={() => {
+                                    setProfileOpen(false);
+                                    localStorage.removeItem('isAuthenticated');
+                                    navigate('/login');
+                                }}
                                 className="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
                             >
                                 <LogOut size={16} className="mr-3 text-red-500" />

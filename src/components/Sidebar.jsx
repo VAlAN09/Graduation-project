@@ -1,8 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Database, Users, CalendarCheck, Clock, Layers, Star, UserPlus, FileText, Settings, LogOut } from 'lucide-react';
 import clsx from 'clsx';
 
 const Sidebar = ({ mobileOpen, setMobileOpen, activeTab, setActiveTab }) => {
+  const navigate = useNavigate();
   const menuItems = [
     { icon: Database, label: 'Dashboard' },
     { icon: Users, label: 'Employees' },
@@ -63,7 +65,13 @@ const Sidebar = ({ mobileOpen, setMobileOpen, activeTab, setActiveTab }) => {
           </nav>
 
           <div className="pt-6 border-t border-gray-50">
-            <button className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-gray-500 hover:bg-red-50 hover:text-red-600 transition-colors text-sm font-medium">
+            <button 
+              onClick={() => {
+                localStorage.removeItem('isAuthenticated');
+                navigate('/login');
+              }}
+              className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-gray-500 hover:bg-red-50 hover:text-red-600 transition-colors text-sm font-medium"
+            >
               <LogOut size={20} />
               Logout
             </button>
