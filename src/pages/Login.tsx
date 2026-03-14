@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,7 +8,7 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
-    const handleLogin = (e) => {
+    const handleLogin = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         localStorage.setItem('isAuthenticated', 'true');
         navigate('/');
