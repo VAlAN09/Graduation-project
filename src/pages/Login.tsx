@@ -7,11 +7,17 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
+    const [role, setRole] = useState('Employee');
 
     const handleLogin = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         localStorage.setItem('isAuthenticated', 'true');
-        navigate('/');
+        localStorage.setItem('userRole', role);
+        if (role === 'Employee') {
+            navigate('/employee/home');
+        } else {
+            navigate('/');
+        }
     };
 
     return (
@@ -25,6 +31,18 @@ const Login = () => {
                 </div>
 
                 <form onSubmit={handleLogin} className="space-y-5">
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-medium text-gray-700">Role</label>
+                        <select
+                            className="block w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
+                            value={role}
+                            onChange={(e) => setRole(e.target.value)}
+                        >
+                            <option value="Employee">Employee</option>
+                            <option value="Supervisor">Supervisor / Admin</option>
+                        </select>
+                    </div>
+
                     <div className="space-y-1.5">
                         <label className="text-sm font-medium text-gray-700">Email</label>
                         <div className="relative">
