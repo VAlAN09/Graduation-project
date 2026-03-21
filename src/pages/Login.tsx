@@ -6,17 +6,47 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    const [role, setRole] = useState('Employee');
 
-    const handleLogin = (e: FormEvent<HTMLFormElement>) => {
+    const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('userRole', role);
-        if (role === 'Employee') {
-            navigate('/employee/home');
-        } else {
-            navigate('/');
+        setError('');
+        setLoading(true);
+
+        try {
+            const response = await fetch('http://localhost:8000/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Login failed');
+            }
+
+            localStorage.setItem('isAuthenticated', 'true');
+            localStorage.setItem('token', data.token);
+            
+            const userRole = data.user?.role || '';
+            localStorage.setItem('userRole', userRole);
+            localStorage.setItem('user', JSON.stringify(data.user));
+
+            if (userRole.toLowerCase() === 'employee') {
+                navigate('/employee/home');
+            } else {
+                navigate('/');
+            }
+        } catch (err: any) {
+            setError(err.message || 'An error occurred during login');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -31,17 +61,11 @@ const Login = () => {
                 </div>
 
                 <form onSubmit={handleLogin} className="space-y-5">
-                    <div className="space-y-1.5">
-                        <label className="text-sm font-medium text-gray-700">Role</label>
-                        <select
-                            className="block w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
-                            value={role}
-                            onChange={(e) => setRole(e.target.value)}
-                        >
-                            <option value="Employee">Employee</option>
-                            <option value="Supervisor">Supervisor / Admin</option>
-                        </select>
-                    </div>
+                    {error && (
+                        <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm text-center">
+                            {error}
+                        </div>
+                    )}
 
                     <div className="space-y-1.5">
                         <label className="text-sm font-medium text-gray-700">Email</label>
@@ -52,9 +76,10 @@ const Login = () => {
                             <input
                                 type="text"
                                 className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors"
-                                placeholder="Email or Username"
+                                placeholder="Email address"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
+                                required
                             />
                         </div>
                     </div>
@@ -71,6 +96,7 @@ const Login = () => {
                                 placeholder="••••••••"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
+                                required
                             />
                             <button
                                 type="button"
@@ -108,10 +134,12 @@ const Login = () => {
 
                     <button
                         type="submit"
-                        className="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
+                        disabled={loading}
+                        className={`w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white transition-all duration-200 
+                            ${loading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'}`}
                     >
-                        Sign in
-                        <ArrowRight className="ml-2 h-4 w-4" />
+                        {loading ? 'Signing in...' : 'Sign in'}
+                        {!loading && <ArrowRight className="ml-2 h-4 w-4" />}
                     </button>
                 </form>
             </div>
