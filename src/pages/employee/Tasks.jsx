@@ -1,15 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, PlayCircle, Clock } from 'lucide-react';
+import { api } from '../../api/api';
+
 
 const EmployeeTasks = () => {
     const [tasks, setTasks] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        // Fetch tasks data here
-        // setIsLoading(true);
-        // fetch('/api/tasks').then(...).finally(() => setIsLoading(false));
+        const fetchTasks = async () => {
+            try {
+                const data = await api.get('/my-tasks');
+                const formattedTasks = data.map(task => ({
+                    id: task.task_id,
+                    title: task.title,
+                    status: formatStatus(task.status),
+                    assignedBy: task.creator ? `${task.creator.first_name} ${task.creator.last_name}` : 'Unknown',
+                    deadline: new Date(task.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                }));
+                setTasks(formattedTasks);
+            } catch (error) {
+                console.error("Failed to fetch tasks:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchTasks();
     }, []);
+
+    const formatStatus = (status) => {
+        if (status === 'pending') return 'Pending';
+        if (status === 'progress') return 'In Progress';
+        if (status === 'completed') return 'Completed';
+        return status;
+    };
+
 
     return (
         <div className="max-w-6xl mx-auto space-y-6">

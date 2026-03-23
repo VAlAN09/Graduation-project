@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Users, Calendar, Briefcase, TrendingUp } from 'lucide-react';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -6,25 +6,37 @@ import {
 } from 'recharts';
 import StatCard from '../components/StatCard';
 import ChartCard from '../components/ChartCard';
-
-const dataAttendance = [
-    { name: 'Mon', present: 0 },
-    { name: 'Tue', present: 0 },
-    { name: 'Wed', present: 0 },
-    { name: 'Thu', present: 0 },
-    { name: 'Fri', present: 0 },
-];
-
-const dataGrowth = [
-    { name: 'Jan', employees: 0 },
-    { name: 'Feb', employees: 0 },
-    { name: 'Mar', employees: 0 },
-    { name: 'Apr', employees: 0 },
-    { name: 'May', employees: 0 },
-    { name: 'Jun', employees: 0 },
-];
+import { api } from '../api/api';
 
 const Dashboard = () => {
+    const [stats, setStats] = useState(null);
+    const [attendanceTrends, setAttendanceTrends] = useState([]);
+    const [growth, setGrowth] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchDashboardData = async () => {
+            try {
+                const data = await api.get('/admin/dashboard');
+                if (data) {
+                    setStats(data.stats || null);
+                    setAttendanceTrends(data.attendanceTrends || []);
+                    setGrowth(data.growth || []);
+                }
+            } catch (error) {
+                console.error("Failed to fetch admin dashboard:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchDashboardData();
+    }, []);
+
+
+
+    if (isLoading) return <div className="p-8 text-center text-gray-500">Loading dashboard...</div>;
+    if (!stats) return <div className="p-8 text-center text-red-500">Failed to load dashboard.</div>;
+
     return (
         <>
             <div className="mb-8">
@@ -36,37 +48,39 @@ const Dashboard = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <StatCard
                     title="Total Employees"
-                    value="0"
-                    change="0%"
+                    value={stats?.totalEmployees || 0}
+                    change="+2%"
                     trend="up"
                     icon={Users}
                     color="blue"
                 />
                 <StatCard
                     title="On Leave Today"
-                    value="0"
-                    change="0%"
+                    value={stats?.onLeaveToday || 0}
+                    change="-5%"
                     trend="down"
                     icon={Calendar}
                     color="orange"
                 />
                 <StatCard
                     title="Open Positions"
-                    value="0"
-                    change="0%"
+                    value={stats?.openPositions || 0}
+                    change="+1"
                     trend="up"
                     icon={Briefcase}
                     color="purple"
                 />
                 <StatCard
                     title="Performance Avg"
-                    value="0%"
-                    change="0%"
+                    value={stats?.performanceAvg || "0%"}
+                    change="+0.5%"
                     trend="up"
                     icon={TrendingUp}
                     color="green"
                 />
+
             </div>
+
 
             {/* Charts Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
@@ -81,7 +95,7 @@ const Dashboard = () => {
                 >
                     <div className="h-[300px] w-full mt-4">
                         <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={dataAttendance} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                            <BarChart data={attendanceTrends} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
                                 <XAxis
                                     dataKey="name"
@@ -101,6 +115,7 @@ const Dashboard = () => {
                                 />
                                 <Bar dataKey="present" fill="#3B82F6" radius={[4, 4, 0, 0]} barSize={40} />
                             </BarChart>
+
                         </ResponsiveContainer>
                     </div>
                 </ChartCard>
@@ -113,7 +128,7 @@ const Dashboard = () => {
                 >
                     <div className="h-[300px] w-full mt-4">
                         <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={dataGrowth} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                            <LineChart data={growth} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
                                 <XAxis
                                     dataKey="name"
@@ -139,6 +154,7 @@ const Dashboard = () => {
                                     activeDot={{ r: 6 }}
                                 />
                             </LineChart>
+
                         </ResponsiveContainer>
                     </div>
                 </ChartCard>

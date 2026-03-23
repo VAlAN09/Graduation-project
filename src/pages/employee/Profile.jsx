@@ -1,16 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { User, Mail, Phone, Hash, Briefcase, MapPin } from 'lucide-react';
+import { api } from '../../api/api';
+
 
 const EmployeeProfile = () => {
     const [profile, setProfile] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        // Fetch profile data here
-        // fetch('/api/profile').then(res => res.json()).then(data => setProfile(data)).finally(() => setIsLoading(false));
-        // For now, simulating an empty fetch completion:
-        setIsLoading(false);
+        const fetchProfile = async () => {
+            try {
+                const data = await api.get('/profile');
+                setProfile(data);
+            } catch (error) {
+                console.error("Failed to fetch profile:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchProfile();
     }, []);
+
 
     if (isLoading) {
         return <div className="text-center mt-20 text-gray-500">Loading profile...</div>;
@@ -30,9 +41,10 @@ const EmployeeProfile = () => {
                     <div className="absolute top-0 left-0 w-full h-full bg-white opacity-5" style={{ backgroundImage: 'radial-gradient(circle, #000 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
                     <div className="relative z-10 flex flex-col items-center">
                         <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-xl mb-4 border-4 border-white/20">
-                            <span className="text-4xl font-bold text-blue-600">{profile.name ? profile.name.charAt(0).toUpperCase() : 'U'}</span>
+                            <span className="text-4xl font-bold text-blue-600">{profile?.name ? profile.name.trim().charAt(0).toUpperCase() : 'U'}</span>
                         </div>
-                        <h2 className="text-2xl font-bold text-white mb-1">{profile.name}</h2>
+                        <h2 className="text-2xl font-bold text-white mb-1">{profile?.name || 'User'}</h2>
+
                         <span className="inline-block bg-blue-700/50 text-blue-50 text-xs font-semibold px-3 py-1 rounded-full border border-blue-400/30">
                             {profile.role || 'Employee'}
                         </span>

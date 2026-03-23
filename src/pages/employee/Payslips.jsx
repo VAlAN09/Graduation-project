@@ -1,15 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import { Wallet, Banknote, MinusCircle, FileText } from 'lucide-react';
+import { api } from '../../api/api';
+
 
 const EmployeePayslips = () => {
     const [payslipData, setPayslipData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        // Fetch payslip data here
-        // fetch('/api/payslip/latest').then(res => res.json()).then(data => setPayslipData(data)).finally(() => setIsLoading(false));
-        setIsLoading(false);
+        const fetchPayslips = async () => {
+            try {
+                const data = await api.get('/payslips');
+                if (data.length > 0) {
+                    const latest = data[0];
+                    setPayslipData({
+                        basicSalary: parseFloat(latest.baseSalary.replace('EGP ', '').replace(',', '')),
+                        netSalary: parseFloat(latest.amount.replace('EGP ', '').replace(',', '')),
+                        totalDeductions: parseFloat(latest.deductions.replace('EGP ', '').replace(',', '')),
+                        deductions: [
+                            { id: 1, type: 'General Deductions', amount: parseFloat(latest.deductions.replace('EGP ', '').replace(',', '')), date: latest.month }
+                        ]
+                    });
+                }
+            } catch (error) {
+                console.error("Failed to fetch payslips:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchPayslips();
     }, []);
+
 
     if (isLoading) {
         return <div className="text-center mt-20 text-gray-500">Loading payslip details...</div>;
@@ -32,7 +54,8 @@ const EmployeePayslips = () => {
                     </div>
                     <div>
                         <p className="text-sm text-gray-400 font-medium mb-1">Basic Salary</p>
-                        <p className="text-2xl font-bold text-blue-600">${payslipData ? payslipData.basicSalary.toFixed(2) : '0.00'}</p>
+                        <p className="text-2xl font-bold text-blue-600">EGP {payslipData ? payslipData.basicSalary.toFixed(2) : '0.00'}</p>
+
                     </div>
                 </div>
 
@@ -42,7 +65,8 @@ const EmployeePayslips = () => {
                     </div>
                     <div>
                         <p className="text-sm text-gray-400 font-medium mb-1">Net Salary</p>
-                        <p className="text-2xl font-bold text-emerald-500">${payslipData ? payslipData.netSalary.toFixed(2) : '0.00'}</p>
+                        <p className="text-2xl font-bold text-emerald-500">EGP {payslipData ? payslipData.netSalary.toFixed(2) : '0.00'}</p>
+
                     </div>
                 </div>
 
@@ -53,7 +77,8 @@ const EmployeePayslips = () => {
                         </div>
                         <span className="font-bold text-gray-800 text-lg">Total Deductions</span>
                     </div>
-                    <span className="font-bold text-red-500 text-lg">- ${payslipData ? payslipData.totalDeductions.toFixed(2) : '0.00'}</span>
+                    <span className="font-bold text-red-500 text-lg">- EGP {payslipData ? payslipData.totalDeductions.toFixed(2) : '0.00'}</span>
+
                 </div>
             </div>
 
@@ -76,7 +101,8 @@ const EmployeePayslips = () => {
                                     <p className="text-sm text-gray-400">{deduction.date}</p>
                                 </div>
                                 <div className="mt-4">
-                                    <span className="font-bold text-red-500">- ${deduction.amount.toFixed(2)}</span>
+                                    <span className="font-bold text-red-500">- EGP {deduction.amount.toFixed(2)}</span>
+
                                 </div>
                             </div>
                         ))

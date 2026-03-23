@@ -11,6 +11,19 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminEmployeeController;
+use App\Http\Controllers\Admin\AdminAttendanceController;
+use App\Http\Controllers\Admin\AdminPayrollController;
+use App\Http\Controllers\BalanceController;
+
+use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\PayrollController;
+
+
+
 
 
 
@@ -91,6 +104,33 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // حذف مهمة
     Route::delete('/tasks/{id}', [TaskController::class, 'destroy']);
+
+    // Dashboard summary
+    Route::get('/dashboard', [DashboardController::class, 'index']);
+
+    // User Profile
+    Route::get('/profile', [ProfileController::class, 'show']);
+    Route::put('/profile', [ProfileController::class, 'update']);
+
+    // Payroll / Payslips
+    Route::get('/payslips', [PayrollController::class, 'index']);
+
+    // Manual Leave Balance Update
+    Route::post('/leave-balance/update', [BalanceController::class, 'update']);
+
+    // Departments
+    Route::get('/departments', [DepartmentController::class, 'index']);
 });
+
+
+Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index']);
+    Route::apiResource('employees', AdminEmployeeController::class);
+    Route::get('/attendance', [AdminAttendanceController::class, 'index']);
+    Route::get('/payroll', [AdminPayrollController::class, 'index']);
+});
+
+
+
 
 

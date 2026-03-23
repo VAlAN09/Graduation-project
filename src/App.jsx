@@ -13,6 +13,7 @@ import Performance from './pages/Performance';
 import Recruitment from './pages/Recruitment';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
+import Tasks from './pages/Tasks';
 
 const pageComponents = {
   'Dashboard': Dashboard,
@@ -23,6 +24,7 @@ const pageComponents = {
   'Performance': Performance,
   'Recruitment': Recruitment,
   'Reports': Reports,
+  'Tasks': Tasks,
   'Settings': Settings,
 };
 

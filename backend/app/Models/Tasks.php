@@ -14,6 +14,7 @@ class Tasks extends Model
     protected $primaryKey = 'task_id';
 
     public $timestamps = true; // لو عندك created_at و updated_at
+    const UPDATED_AT = null;
 
     protected $fillable = [
         'title',

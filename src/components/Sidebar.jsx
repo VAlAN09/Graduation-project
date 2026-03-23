@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Database, Users, CalendarCheck, Clock, Layers, Star, UserPlus, FileText, Settings, LogOut } from 'lucide-react';
+import { Database, Users, CalendarCheck, Clock, Layers, Star, UserPlus, FileText, Settings, LogOut, CheckSquare } from 'lucide-react';
 import clsx from 'clsx';
 
 const Sidebar = ({ mobileOpen, setMobileOpen, activeTab, setActiveTab }) => {
@@ -14,6 +14,7 @@ const Sidebar = ({ mobileOpen, setMobileOpen, activeTab, setActiveTab }) => {
     { icon: Star, label: 'Performance' },
     { icon: UserPlus, label: 'Recruitment' },
     { icon: FileText, label: 'Reports' },
+    { icon: CheckSquare, label: 'Tasks' },
     { icon: Settings, label: 'Settings' },
   ];
 

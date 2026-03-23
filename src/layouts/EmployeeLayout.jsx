@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { Home, Clock, CheckSquare, FileText, Calendar, User, Menu, X, LogOut } from 'lucide-react';
+import { api } from '../api/api';
+
 
 const EmployeeLayout = () => {
     const [mobileOpen, setMobileOpen] = useState(false);
@@ -8,9 +10,17 @@ const EmployeeLayout = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Fetch specific layout user data here
-        // fetch('/api/user').then(...);
+        const fetchUser = async () => {
+            try {
+                const userData = await api.get('/user');
+                setUser(userData);
+            } catch (error) {
+                console.error("Failed to fetch user:", error);
+            }
+        };
+        fetchUser();
     }, []);
+
 
     const handleLogout = () => {
         localStorage.removeItem('isAuthenticated');
@@ -107,11 +117,12 @@ const EmployeeLayout = () => {
                         </div>
                         <div className="flex items-center space-x-3 cursor-pointer">
                             <div className="w-9 h-9 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold shadow-inner">
-                                {user ? user.name.charAt(0).toUpperCase() : 'U'}
+                                {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
                             </div>
                             <span className="text-sm font-medium hidden sm:block">
-                                {user ? user.name : 'Loading...'}
+                                {user?.name || 'User'}
                             </span>
+
                         </div>
                     </div>
                 </header>

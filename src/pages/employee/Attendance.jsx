@@ -1,15 +1,51 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar as CalendarIcon, Clock } from 'lucide-react';
+import { api } from '../../api/api';
+
 
 const EmployeeAttendance = () => {
     const [recentDays, setRecentDays] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
+    const [summary, setSummary] = useState({ present_days: 0, absent_days: 0, leave_days: 0 });
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        // Fetch attendance data here
-        // setIsLoading(true);
-        // fetch('/api/attendance').then(...).finally(() => setIsLoading(false));
+        const fetchAttendance = async () => {
+            try {
+                const data = await api.get('/attendance-history');
+                const formattedRecords = data.records.map(record => {
+                    const dateObj = new Date(record.date);
+                    return {
+                        day: record.day.substring(0, 3),
+                        date: dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }),
+                        in: record.in_time ? record.in_time.substring(0, 5) : '--:--',
+                        out: record.out_time ? record.out_time.substring(0, 5) : '--:--',
+                        duration: record.in_time && record.out_time ? calculateDuration(record.in_time, record.out_time) : '--',
+                        status: capitalize(record.status)
+                    };
+                });
+                setRecentDays(formattedRecords);
+                setSummary(data.summary);
+            } catch (error) {
+                console.error("Failed to fetch attendance:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchAttendance();
     }, []);
+
+    const calculateDuration = (inTime, outTime) => {
+        const start = new Date(`2000-01-01T${inTime}`);
+        const end = new Date(`2000-01-01T${outTime}`);
+        const diff = (end - start) / (1000 * 60); // minutes
+        const hours = Math.floor(diff / 60);
+        const mins = Math.floor(diff % 60);
+        return `${hours}h ${mins}m`;
+    };
+
+    const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
 
     return (
         <div className="max-w-4xl mx-auto space-y-6">
@@ -22,21 +58,22 @@ const EmployeeAttendance = () => {
                     <h1 className="text-2xl font-bold text-gray-900">Current Month</h1>
                 </div>
 
-                {/* Legend */}
+                {/* Legend & Summary */}
                 <div className="flex items-center space-x-4 text-sm font-medium bg-white px-4 py-2 rounded-lg shadow-sm">
                     <div className="flex items-center space-x-2">
                         <div className="w-3 h-1 bg-green-500 rounded-full"></div>
-                        <span className="text-gray-600">Present</span>
+                        <span className="text-gray-600">Present ({summary.present_days})</span>
                     </div>
                     <div className="flex items-center space-x-2">
                         <div className="w-3 h-1 bg-red-500 rounded-full"></div>
-                        <span className="text-gray-600">Absent</span>
+                        <span className="text-gray-600">Absent ({summary.absent_days})</span>
                     </div>
                     <div className="flex items-center space-x-2">
                         <div className="w-3 h-1 bg-orange-500 rounded-full"></div>
-                        <span className="text-gray-600">Leave</span>
+                        <span className="text-gray-600">Leave ({summary.leave_days})</span>
                     </div>
                 </div>
+
             </div>
 
             {/* List View */}

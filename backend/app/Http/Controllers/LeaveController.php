@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\LeaveRequest;
-use App\Models\alerts;
+use App\Models\Alert;
 use App\Models\LeaveBalance;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+
 
 
 class LeaveController extends Controller
@@ -107,12 +108,28 @@ public function approve($id)
         $leave->status = 'approved';
         $leave->save();
 
+        // خصم الرصيد
+        $start = \Carbon\Carbon::parse($leave->start_date);
+        $end   = \Carbon\Carbon::parse($leave->end_date);
+        $days = $start->diffInDays($end) + 1;
+
+        $balance = LeaveBalance::where('user_id', $leave->user_id)
+            ->where('year', \Carbon\Carbon::now()->year)
+            ->first();
+
+        if ($balance && isset($balance->{$leave->leave_type})) {
+            $balance->{$leave->leave_type} -= $days;
+            $balance->save();
+        }
+
+
         
-        Alerts::create([
+        Alert::create([
             'user_id' => $leave->user_id,
             'alert_type' => 'leave_approved',
             'content' => 'Your leave request has been approved'
         ]);
+
 
         $start = \Carbon\Carbon::parse($leave->start_date);
         $end   = \Carbon\Carbon::parse($leave->end_date);
@@ -154,11 +171,12 @@ public function reject($id)
     $leave->save();
 
     // create alert
-    alerts::create([
+    Alert::create([
         'user_id' => $leave->user_id,
         'alert_type' => 'leave_rejected',
         'content' => 'Your leave request has been rejected'
     ]);
+
 
     return response()->json([
         'message' => 'Leave rejected',

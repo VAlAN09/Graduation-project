@@ -13,8 +13,24 @@ class TaskController extends Controller
     {
         $user = $request->user();
         
-        // استخدام user_id حسب تسمية جدولك
-        $tasks = Tasks::where('assigned_to', $user->user_id)
+        // جلب المهام ومعاها بيانات اللي أنشأها
+        $tasks = Tasks::with('creator')
+            ->where('assigned_to', $user->user_id)
+            ->orderBy('due_date', 'asc')
+            ->get();
+
+
+        return response()->json($tasks);
+    }
+
+    // جلب كل المهام اللي السوبرفايزر أنشأها
+    public function supervisorTasks(Request $request)
+    {
+        $user = $request->user();
+        
+        // جلب المهام اللي اليوزر ده كريتها ومعاها بيانات الموظف المخصص له
+        $tasks = Tasks::with('assignee')
+            ->where('created_by', $user->user_id)
             ->orderBy('due_date', 'asc')
             ->get();
 
