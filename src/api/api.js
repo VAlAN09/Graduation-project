@@ -11,13 +11,11 @@ const getHeaders = () => {
 
 export const api = {
     async get(endpoint) {
-        const response = await fetch(`${BASE_URL}${endpoint}`, {
-            headers: getHeaders(),
-        });
+        const response = await fetch(`${BASE_URL}${endpoint}`, { headers: getHeaders() });
         if (response.status === 401) {
-            // Handle unauthorized (logout)
             localStorage.removeItem('token');
             localStorage.removeItem('isAuthenticated');
+            localStorage.removeItem('role');
             window.location.href = '/login';
             return null;
         }
